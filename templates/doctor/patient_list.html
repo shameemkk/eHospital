@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Patient List</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100">
+    {% include 'doctor/doctor_header.html' %}
+
+
+    <div class="container mx-auto mt-10">
+        <h1 class="text-3xl font-bold mb-6">Patient List</h1>
+        
+        <table class="min-w-full bg-white border border-gray-300 rounded-lg shadow-md">
+            <thead>
+                <tr class="bg-gray-200 text-gray-700">
+                    <th class="py-3 px-4 border-b">Patient ID</th>
+                    <th class="py-3 px-4 border-b">Name</th>
+                    <th class="py-3 px-4 border-b">Age</th>
+                    <th class="py-3 px-4 border-b">Contact</th>
+                    <th class="py-3 px-4 border-b">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for patient in patients %}
+                <tr class="hover:bg-gray-100">
+                    <td class="py-3 px-4 border-b">{{ patient.id }}</td>
+                    <td class="py-3 px-4 border-b">{{ patient.name }}</td>
+                    <td class="py-3 px-4 border-b">{{ patient.age }}</td>
+                    <td class="py-3 px-4 border-b">{{ patient.address }}</td>
+                    <td class="py-3 px-4 border-b">
+                        <a href="{% url 'patient_detail' patient.id %}" class="text-blue-500 hover:underline">View Details</a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" class="py-3 px-4 text-center">No patients found.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+</body>
+</html>

@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Doctor Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<style>
+    html, body {
+    height: 100%;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+main {
+    flex: 1;
+}
+</style>
+<body class="bg-gray-100 font-sans">
+    {% include 'doctor/doctor_header.html' %}
+
+
+    <main class="container mx-auto px-4 py-8">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <section class="bg-white rounded-lg shadow-md p-6">
+                <h2 class="text-2xl font-semibold mb-4 text-gray-800">Statistics</h2>
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="bg-blue-100 p-4 rounded-lg">
+                        <h3 class="text-lg font-medium text-blue-800">Total Patients</h3>
+                        <p class="text-3xl font-bold text-blue-600">{{ patients_count }}</p>
+                    </div>
+                    <div class="bg-green-100 p-4 rounded-lg">
+                        <h3 class="text-lg font-medium text-green-800">Upcoming Appointments</h3>
+                        <p class="text-3xl font-bold text-green-600">{{ upcoming_appointments_count }}</p>
+                    </div>
+                </div>
+            </section>
+
+            <section class="bg-white rounded-lg shadow-md p-6">
+                <h2 class="text-2xl font-semibold mb-4 text-gray-800">Quick Actions</h2>
+                <ul class="space-y-2">
+                    <li><a href="{% url 'appointment_schedule_list' %}" class="block bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 transition duration-300">Schedule Appointment</a></li>
+                    <!-- <li><a href=" 'e_prescribe' appointment.patient.id appointment.id %}" class="block bg-green-500 text-white py-2 px-4 rounded hover:bg-green-600 transition duration-300">E-Prescribe</a></li> -->
+                    <li><a href="{% url 'patient_list' %}" class="block bg-purple-500 text-white py-2 px-4 rounded hover:bg-purple-600 transition duration-300">Manage Patients</a></li>
+                </ul>
+            </section>
+        </div>
+
+        <section class="mt-8 bg-white rounded-lg shadow-md p-6">
+            <h2 class="text-2xl font-semibold mb-4 text-gray-800">Upcoming Appointments</h2>
+            <div class="overflow-x-auto">
+                <table class="w-full table-auto">
+                    <thead class="bg-gray-200">
+                        <tr>
+                            <th class="px-4 py-2 text-left">Date</th>
+                            <th class="px-4 py-2 text-left">Patient</th>
+                            <th class="px-4 py-2 text-left">Status</th>
+                            <th class="px-4 py-2 text-left">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for appointment in appointments %}
+                        <tr class="border-b">
+                            <td class="px-4 py-2">{{ appointment.appointment_date |date:"Y-m-d" }}</td>
+                            <td class="px-4 py-2">{{ appointment.patient.name }}</td>
+                            <td class="px-4 py-2">
+                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
+                                    {% if appointment.status == 'Confirmed' %}bg-green-100 text-green-800
+                                    {% elif appointment.status == 'Pending' %}bg-yellow-100 text-yellow-800
+                                    {% else %}bg-red-100 text-red-800{% endif %}">
+                                    {{ appointment.status }}
+                                </span>
+                            </td>
+                            <td class="px-4 py-2">
+                                <a href="{% url 'patient_detail' appointment.patient.id %}" class="text-blue-600 hover:text-blue-800">View</a>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="4" class="px-4 py-2 text-center text-gray-500">No upcoming appointments.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+    <footer class="bg-gray-800 text-white py-4">
+        <div class="container mx-auto text-center">
+            <p>&copy; 2023 eHospital. All rights reserved.</p>
+        </div>
+    </footer>
+</body>
+</html>

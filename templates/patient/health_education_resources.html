@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Healthcare Patient Portal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <style>
+        .description {
+            max-height: 90px; /* Limit height */
+            overflow: hidden; /* Hide overflow */
+            text-overflow: ellipsis; /* Add ellipsis for overflow text */
+            display: -webkit-box; /* For webkit browsers */
+            
+            -webkit-box-orient: vertical; /* Set box orientation */
+        }
+    </style>
+</head>
+<div class="flex h-screen bg-gray-100">
+    {% include 'patient/aside.html' %}
+    <!-- Main Content -->
+    <main class="flex-1 p-8 overflow-y-auto">
+        <h2 class="text-3xl font-bold mb-6">Health Education Resources</h2>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {% for resource in resources %}
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <h3 class="text-xl font-semibold mb-2">{{ resource.title }}</h3>
+                    <p class="description text-gray-600 mb-4">{{ resource.description }}</p>
+                    <div class="flex justify-between items-center">
+                        <span class="text-sm text-gray-500">Category: {{ resource.category }}</span>
+                        <a href="{% url 'health_education_resource_detail' resource.id %}" class="text-blue-600 hover:underline" aria-label="Read more about {{ resource.title }}">Read More</a>
+                    </div>
+                </div>
+            {% empty %}
+                <p class="col-span-3 text-center text-lg text-gray-600">No health education resources available at the moment.</p>
+            {% endfor %}
+        </div>
+    </main>
+</div>
+</div>
+</body>
+</html>
+

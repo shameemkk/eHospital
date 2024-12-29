@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Healthcare Patient Portal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+</head>
+<div class="flex h-screen bg-gray-100">
+    <!-- Sidebar (you can include this in your base template) -->
+    {% include 'patient/aside.html' %}
+
+    <!-- Main Content -->
+    <main class="flex-1 p-8 overflow-y-auto">
+        <h2 class="text-3xl font-bold mb-6">Medical History for {{ patient.name }}</h2>
+        
+        {% if medical_history %}
+            {% for entry in medical_history %}
+                <div class="bg-white p-6 rounded-lg shadow-md mb-6">
+                    <h3 class="text-xl font-semibold mb-4">
+                        <i class="fas fa-calendar-day mr-2 text-blue-600"></i>
+                        {{ entry.date_recorded|date:"F d, Y" }}
+                    </h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <h4 class="font-semibold mb-2">Diagnosis:</h4>
+                            <p>{{ entry.diagnosis }}</p>
+                        </div>
+                        <div>
+                            <h4 class="font-semibold mb-2">Medications:</h4>
+                            <p>{{ entry.medications }}</p>
+                        </div>
+                        <div>
+                            <h4 class="font-semibold mb-2">Allergies:</h4>
+                            <p>{{ entry.allergies }}</p>
+                        </div>
+                        <div>
+                            <h4 class="font-semibold mb-2">Treatment History:</h4>
+                            <p>{{ entry.treatment_history }}</p>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <p class="text-lg">No medical history available.</p>
+        {% endif %}
+    </main>
+</div>
+</body>
+</html>
+

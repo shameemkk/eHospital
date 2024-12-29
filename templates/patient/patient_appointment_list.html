@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Healthcare Patient Portal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100">
+<div class="flex h-screen bg-gray-100">
+    <!-- Sidebar -->
+    {% include 'patient/aside.html' %}
+
+    <!-- Main Content -->
+    <main class="flex-1 p-8 overflow-y-auto">
+        <h2 class="text-3xl font-bold mb-6">Your Appointments</h2>
+        
+        <!-- Upcoming Appointments -->
+        <div class="mb-8">
+            <h3 class="text-2xl font-semibold mb-4">Upcoming Appointments</h3>
+            {% if upcoming_appointments %}
+                <div class="bg-white rounded-lg shadow overflow-hidden">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date & Time</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Doctor</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200">
+                            {% for appointment in upcoming_appointments %}
+                                <tr>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="text-sm font-medium text-gray-900">{{ appointment.appointment_date|date:"F d, Y" }}</div>
+                                        <div class="text-sm text-gray-500">{{ appointment.slot.time|time:"h:i A" }}</div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="text-sm text-gray-900">Dr. {{ appointment.doctor.first_name }} {{ appointment.doctor.last_name }}</div>
+                                        <div class="text-sm text-gray-500">{{ appointment.doctor.specialty.name }}</div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                                            {{ appointment.status|title }}
+                                        </span>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <a href="{% url 'reschedule_appointment' appointment.id  %}" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Reschedule</a>
+                                        <a href="{% url 'cancel_appointment' appointment.id %}" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">Cancel</a>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <p class="text-gray-600">You have no upcoming appointments.</p>
+            {% endif %}
+        </div>
+
+        <!-- Past Appointments -->
+        <div>
+            <h3 class="text-2xl font-semibold mb-4">Past Appointments</h3>
+            {% if past_appointments %}
+                <div class="bg-white rounded-lg shadow overflow-hidden">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date & Time</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Doctor</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200">
+                            {% for appointment in past_appointments %}
+                                <tr>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="text-sm font-medium text-gray-900">{{ appointment.appointment_date|date:"F d, Y" }}</div>
+                                        <div class="text-sm text-gray-500">{{ appointment.slot.time|time:"h:i A" }}</div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="text-sm text-gray-900">Dr. {{ appointment.doctor.last_name }}</div>
+                                        <div class="text-sm text-gray-500">{{ appointment.doctor.specialty.name }}</div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">
+                                            {{ appointment.status|title }}
+                                        </span>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <p class="text-gray-600">You have no past appointments.</p>
+            {% endif %}
+        </div>
+    </main>
+</div>
+</body>
+</html>
+

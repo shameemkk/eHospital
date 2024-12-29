@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Healthcare Patient Portal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    
+</head>
+<div class="flex h-screen bg-gray-100">
+    <!-- aside -->
+     {% include 'patient/aside.html' %}
+
+     <!-- Main Content -->
+     <main class="flex-1 p-8 overflow-y-auto">
+        <div class="max-w-3xl mx-auto bg-white rounded-lg shadow-md">
+            <div class="p-6">
+                <h2 class="text-3xl font-bold mb-4"> {{ resource.title }}</h2>
+                <p class="text-gray-600 mb-4">Category: {{ resource.category }}</p>
+                <div class="prose max-w-none">
+                    {{ resource.description |safe }}
+                </div>
+            </div>
+            <div class="bg-gray-100 px-6 py-4">
+                <p class="text-sm text-gray-600">Last updated: {{ resource.created_at |date:"F d, Y" }}</p>
+                <a href="{% url 'health_education_resources' %}" class="inline-block mt-2 text-blue-600 hover:underline">
+                    <i class="fas fa-arrow-left mr-2"></i>Back to Health Education Resources
+                </a>
+            </div>
+        </div>
+    </main>
+
+
+</div>
+</div>
+</body>
+</html>
+

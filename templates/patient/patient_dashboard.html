@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Healthcare Patient Portal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100">
+    <div class="flex h-screen">
+        <!-- Sidebar -->
+        {% include 'patient/aside.html' %}
+    
+        <!-- Main Content -->
+        <main class="flex-1 p-8 overflow-y-auto">
+            <h2 class="text-3xl font-bold mb-6">Welcome, {{ patient.name }}</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Appointment Booking -->
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <h3 class="text-xl font-semibold mb-4"><i class="fas fa-calendar-alt mr-2 text-blue-600"></i>Appointments</h3>
+                    {% if next_appointment %}
+                        <p class="mb-4">Next appointment: <strong>{{ next_appointment.appointment_date|date:"F d, Y" }} at {{ next_appointment.slot.time|time:"h:i A" }} </strong></p>
+                    {% else %}
+                        <p class="mb-4">No upcoming appointments</p>
+                    {% endif %}
+                    <a href="{% url 'patient_appointment_list' %}" class="bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700">View all</a>
+                    <a href="{% url 'specialty-list'%}" class="bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700">Schedule New</a>
+                </div>
+    
+                <!-- Medical History -->
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <h3 class="text-xl font-semibold mb-4"><i class="fas fa-file-medical mr-2 text-blue-600"></i>Medical History</h3>
+                    {% if last_medical_history %}
+                        <ul class="list-disc list-inside mb-4">
+                            <li>Last visit: {{ last_medical_history.date_recorded|date:"F d, Y" }}</li>
+                            <li>Allergies: {{ last_medical_history.allergies }}</li>
+                            <li>Current medications: {{ last_medical_history.medications }}</li>
+                        </ul>
+                    {% else %}
+                        <p class="mb-4">No medical history available</p>
+                    {% endif %}
+                    <a href="{% url 'view_full_history' %}" class="text-blue-600 hover:underline">View Full History</a>
+                </div>
+    
+                <!-- Billing and Payments -->
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <h3 class="text-xl font-semibold mb-4"><i class="fas fa-file-invoice-dollar mr-2 text-blue-600"></i>Billing</h3>
+                    <p class="mb-4">Current balance: <strong>${{ current_balance|floatformat:2 }}</strong></p>
+                    <button id="toggleBillingButton" class="bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700" onclick="toggleBillingInfo()">Show Billing Information</button>
+
+                    <!-- <button class="bg-green-600 text-white py-2 px-4 rounded hover:bg-green-700">Make Payment</button> -->
+                </div>
+    
+                <!-- Health Education Resources -->
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <h3 class="text-xl font-semibold mb-4"><i class="fas fa-book-medical mr-2 text-blue-600"></i>Health Education</h3>
+                    <ul class="list-disc list-inside mb-4">
+                        {% for resource in education_resource %}
+                            <li><a href="{% url 'health_education_resource_detail' resource.id %}" class="text-blue-600 hover:underline">{{ resource.title }}</a></li>
+                        {% endfor %}
+                    </ul>
+                    <a href="{% url 'health_education_resources' %}" class="text-blue-600 hover:underline">View All Resources</a>
+                </div>
+    
+                <!-- Profile -->
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <h3 class="text-xl font-semibold mb-4"><i class="fas fa-user mr-2 text-blue-600"></i>Profile</h3>
+                    <p class="mb-2"><strong>Name:</strong> {{ patient.name }}</p>
+                    <p class="mb-2"><strong>Age:</strong> {{ patient.age }}</p>
+                    <p class="mb-2"><strong>Gender:</strong> {{ patient.gender }}</p>
+                    <p class="mb-2"><strong>Email:</strong> {{ patient.email }}</p>
+                    <p class="mb-4"><strong>Phone:</strong> {{ patient.phone_number }}</p>
+                    <button class="bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700" onclick="toggleModal()">Edit Profile</button>
+                </div>
+
+                <!-- Modal -->
+                <div id="editProfileModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden">
+                    <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+                        <div class="mt-3 text-center">
+                            <h3 class="text-lg leading-6 font-medium text-gray-900">Edit Profile</h3>
+                            <div class="mt-2">
+                                <form action="{% url 'profile_edit' %}" method="post">
+                                    {% csrf_token %}
+                                    <div class="mb-4">
+                                        <label class="block text-gray-700 text-sm font-bold mb-2" for="name">Name</label>
+                                        <input name="name" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="name" type="text" value="{{ patient.name }}">
+                                    </div>
+                                    <div class="mb-4">
+                                        <label class="block text-gray-700 text-sm font-bold mb-2" for="dob">Age</label>
+                                        <input name="age" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="dob" type="number" value="{{ patient.age }}">
+                                    </div>
+                                    <div class="mb-4">
+                                        <label class="block text-gray-700 text-sm font-bold mb-2" for="gender">Gender</label>
+                                        <select name="gender" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="gender">
+                                            <option value="male" {% if patient.gender == 'male' %}selected{% endif %}>Male</option>
+                                            <option value="female" {% if patient.gender == 'female' %}selected{% endif %}>Female</option>
+                                            <option value="other" {% if patient.gender == 'other' %}selected{% endif %}>Other</option>
+                                        </select>
+                                    </div>
+                                
+                                    <div class="mb-4">
+                                        <label class="block text-gray-700 text-sm font-bold mb-2" for="phone">Phone</label>
+                                        <input name="phone_number" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="phone" type="text" value="{{ patient.phone_number }}">
+                                    </div>
+                                    <div class="flex items-center justify-between">
+                                        <button class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="submit">Update</button>
+                                        <button class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="button" onclick="toggleModal()">Cancel</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Toggle Button for Billing Information -->
+
+                <!-- Billing Information Section -->
+
+                <div id="billingInfo" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden">
+                    <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+                        <div class="mt-3 text-center">
+                            <h3 class="text-lg leading-6 font-medium text-gray-900">Bills Information</h3>
+                            <div class="mt-2">
+                                {% for record in bills %}
+                                <div class="mb-4 border-b pb-4">
+                                    <p><strong>Billing Statement:</strong> {{ record.billing_statement }}</p>
+                                    <p><strong>Amount Due:</strong> ${{ record.amount_due|floatformat:2 }}</p>
+                                    <p><strong>Payment Status:</strong> {{ record.payment_status }}</p>
+                                    <p><strong>Insurance Information:</strong> {{ record.insurance_info }}</p>
+                                    <p><strong>Date Billed:</strong> {{ record.date_billed|date:"F j, Y, g:i a" }}</p>
+                                </div>
+                            {% empty %}
+                                <p>No billing records available.</p>
+                            {% endfor %}
+                            <button class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="button" onclick="toggleBillingInfo()">Close</button>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+                
+               
+            </div>
+        </main>
+       
+    </div>
+   
+</body>
+<script>
+function toggleModal() {
+    var modal = document.getElementById('editProfileModal');
+    modal.classList.toggle('hidden');
+}
+
+function toggleBillingInfo(){
+    var billingInfo = document.getElementById('billingInfo');
+    billingInfo.classList.toggle('hidden');
+}
+
+</script>
+</html>

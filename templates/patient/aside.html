@@ -1,0 +1,14 @@
+<aside class="w-64 bg-blue-600 text-white p-6">
+        <h1 class="text-2xl font-bold mb-8">Patient Portal</h1>
+        <nav>
+            <ul class="space-y-2">
+                <li><a href="{% url 'patient_dashboard' %}" class="block py-2 px-4 hover:bg-blue-700 rounded"><i class="fas fa-home mr-2"></i>Dashboard</a></li>
+                <li><a href="{% url 'specialty-list' %}" class="block py-2 px-4 hover:bg-blue-700 rounded"><i class="fas fa-calendar-alt mr-2"></i>Appointments</a></li>
+                <li><a href="{% url 'view_full_history' %}" class="block py-2 px-4 hover:bg-blue-700 rounded"><i class="fas fa-file-medical mr-2"></i>Medical History</a></li>
+                <li><a href="#" class="block py-2 px-4 hover:bg-blue-700 rounded"><i class="fas fa-file-invoice-dollar mr-2"></i>Billing</a></li>
+                <li><a href="{% url 'health_education_resources' %}" class="block py-2 px-4 hover:bg-blue-700 rounded"><i class="fas fa-book-medical mr-2"></i>Health Education</a></li>
+                <li><a href="#" class="block py-2 px-4 hover:bg-blue-700 rounded"><i class="fas fa-user mr-2"></i>Profile</a></li>
+                <li><a href="{% url 'logout_user' %}" class="block py-2 px-4 hover:bg-blue-700 rounded"><i class="fas fa-sign-out-alt mr-2"></i>Logout</a></li>
+            </ul>
+        </nav>
+    </aside>

@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Appointment Schedule</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100 font-sans">
+    {% include 'doctor/doctor_header.html' %}
+
+    <div class="container mx-auto mt-10 px-4 sm:px-6 lg:px-8">
+        <h1 class="text-4xl font-bold text-center mb-10 text-indigo-700">Appointment Schedule</h1>
+
+        <div class="bg-white shadow-lg rounded-lg overflow-hidden mb-10">
+            <div class="overflow-x-auto">
+                <table class="min-w-full">
+                    <thead>
+                        <tr class="bg-indigo-600 text-white uppercase text-sm leading-normal">
+                            <th class="py-3 px-6 text-left">Date</th>
+                            <th class="py-3 px-6 text-left">Time</th>
+                            <th class="py-3 px-6 text-left">Patient Name</th>
+                            <th class="py-3 px-6 text-left">Status</th>
+                            <th class="py-3 px-6 text-left">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody class="text-gray-700 text-base">
+                        {% for appointment in appointments %}
+                        {% if appointment.status == 'scheduled' %}
+                        <tr class="border-b border-gray-200 hover:bg-gray-50 transition duration-150 ease-in-out">
+                            <td class="py-4 px-6">{{ appointment.appointment_date|date:"Y-m-d" }}</td>
+                            <td class="py-4 px-6">{{ appointment.slot.time }}</td>
+                            <td class="py-4 px-6">{{ appointment.patient.name }}</td>
+                            <td class="py-4 px-6">
+                                <form action="{% url 'appointment_status_change' appointment.id %}" method="POST" class="inline-block">
+                                    {% csrf_token %}
+                                    <select name="status" class="border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                        <option value="scheduled" {% if appointment.status == 'scheduled' %}selected{% endif %}>Scheduled</option>
+                                        <option value="completed" {% if appointment.status == 'completed' %}selected{% endif %}>Completed</option>
+                                        <option value="canceled" {% if appointment.status == 'canceled' %}selected{% endif %}>Canceled</option>
+                                    </select>
+                                    <button type="submit" class="ml-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-md transition duration-150 ease-in-out">
+                                        Change Appointment
+                                    </button>
+                                </form>
+                            </td>
+                            <td class="py-4 px-6">
+                                <button onclick="toggleModal('ePrescribeModal-{{ appointment.id }}')" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-md transition duration-150 ease-in-out">
+                                    e-Prescribe
+                                </button>
+
+                                <!-- Modal for e-Prescribe -->
+                                <div id="ePrescribeModal-{{ appointment.id }}" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden">
+                                    <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+                                        <div class="mt-3">
+                                            <h3 class="text-lg font-medium text-gray-900 mb-4">e-Prescribe</h3>
+                                            <form method="POST" action="{% url 'e_prescribe' appointment.patient.id appointment.id %}">
+                                                {% csrf_token %}
+                                                <div class="mb-4">
+                                                    <label for="medication" class="block text-sm font-medium text-gray-700 mb-1">Medication</label>
+                                                    <input type="text" class="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-indigo-500" id="medication" name="medication" required>
+                                                </div>
+                                                <div class="mb-4">
+                                                    <label for="dosage" class="block text-sm font-medium text-gray-700 mb-1">Dosage</label>
+                                                    <input type="text" class="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-indigo-500" id="dosage" name="dosage" required>
+                                                </div>
+                                                <div class="mb-4">
+                                                    <label for="instructions" class="block text-sm font-medium text-gray-700 mb-1">Instructions</label>
+                                                    <input type="text" class="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-indigo-500" id="instructions" name="instructions" required>
+                                                </div>
+                                                <div class="mb-4">
+                                                    <label for="duration" class="block text-sm font-medium text-gray-700 mb-1">Duration</label>
+                                                    <input type="text" class="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-indigo-500" id="duration" name="duration" required>
+                                                </div>
+                                                <div class="flex justify-between">
+                                                    <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-md transition duration-150 ease-in-out">Submit</button>
+                                                    <button type="button" onclick="toggleModal('ePrescribeModal-{{ appointment.id }}')" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded-md transition duration-150 ease-in-out">
+                                                        Close
+                                                    </button>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endif %}
+                        {% empty %}
+                        <tr>
+                            <td colspan="5" class="py-4 px-6 text-center text-gray-700 text-lg">No appointments scheduled.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <h2 class="text-3xl font-bold text-center mt-16 mb-10 text-indigo-700">Completed or Canceled Appointments</h2>
+        <div class="bg-white shadow-lg rounded-lg overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="min-w-full">
+                    <thead>
+                        <tr class="bg-indigo-600 text-white uppercase text-sm leading-normal">
+                            <th class="py-3 px-6 text-left">Date</th>
+                            <th class="py-3 px-6 text-left">Time</th>
+                            <th class="py-3 px-6 text-left">Patient Name</th>
+                            <th class="py-3 px-6 text-left">Status</th>
+                            <th class="py-3 px-6 text-left">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody class="text-gray-700 text-base">
+                        {% for appointment in appointments %}
+                        {% if appointment.status != 'scheduled' %}
+                        <tr class="border-b border-gray-200 hover:bg-gray-50 transition duration-150 ease-in-out">
+                            <td class="py-4 px-6">{{ appointment.appointment_date|date:"Y-m-d" }}</td>
+                            <td class="py-4 px-6">{{ appointment.slot.time }}</td>
+                            <td class="py-4 px-6">{{ appointment.patient.name }}</td>
+                            <td class="py-4 px-6">
+                                <form action="{% url 'appointment_status_change' appointment.id %}" method="POST" class="inline-block">
+                                    {% csrf_token %}
+                                    <select name="status" class="border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                        <option value="scheduled" {% if appointment.status == 'scheduled' %}selected{% endif %}>Scheduled</option>
+                                        <option value="completed" {% if appointment.status == 'completed' %}selected{% endif %}>Completed</option>
+                                        <option value="canceled" {% if appointment.status == 'canceled' %}selected{% endif %}>Canceled</option>
+                                    </select>
+                                    <button type="submit" class="ml-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-md transition duration-150 ease-in-out">
+                                        Change Appointment
+                                    </button>
+                                </form>
+                            </td>
+                            <td class="py-4 px-6">
+                                <button onclick="toggleModal('viewPrescriptionModal-{{ appointment.id }}')" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-md transition duration-150 ease-in-out">
+                                    View e-Prescribe
+                                </button>
+
+                                <!-- Modal for viewing e-Prescribe -->
+                                <div id="viewPrescriptionModal-{{ appointment.id }}" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden">
+                                    <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+                                        <div class="mt-3">
+                                            <h3 class="text-lg font-medium text-gray-900 mb-4">e-Prescription Details</h3>
+                                            {% if appointment.prescription %}
+                                                <div class="mb-4">
+                                                    <p class="text-sm font-medium text-gray-700">Medication:</p>
+                                                    <p class="text-base">{{ appointment.prescription.medication }}</p>
+                                                </div>
+                                                <div class="mb-4">
+                                                    <p class="text-sm font-medium text-gray-700">Dosage:</p>
+                                                    <p class="text-base">{{ appointment.prescription.dosage }}</p>
+                                                </div>
+                                                <div class="mb-4">
+                                                    <p class="text-sm font-medium text-gray-700">Instructions:</p>
+                                                    <p class="text-base">{{ appointment.prescription.instructions }}</p>
+                                                </div>
+                                                <div class="mb-4">
+                                                    <p class="text-sm font-medium text-gray-700">Duration:</p>
+                                                    <p class="text-base">{{ appointment.prescription.duration }}</p>
+                                                </div>
+                                            {% else %}
+                                                <p class="text-base text-gray-700">No prescription available  {% endif %}
+                                            <div class="mt-4">
+                                                <button onclick="toggleModal('viewPrescriptionModal-{{ appointment.id }}')" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded-md transition duration-150 ease-in-out">
+                                                    Close
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endif %}
+                        {% empty %}
+                        <tr>
+                            <td colspan="5" class="py-4 px-6 text-center text-gray-700 text-lg">No completed or canceled appointments.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    
+    <!-- JavaScript to Toggle Modal -->
+    <script>
+        function toggleModal(modalId) {
+            const modal = document.getElementById(modalId);
+            modal.classList.toggle('hidden');
+        }
+    </script>
+</body>
+</html>
+

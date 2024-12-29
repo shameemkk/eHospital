@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Patient Detail</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100">
+    {% include 'doctor/doctor_header.html' %}
+
+
+    <div class="container mx-auto p-6">
+        <h1 class="text-3xl font-bold mb-4">Patient Detail: {{ patient.name }}</h1>
+
+        <div class="bg-white shadow-md rounded-lg p-6 mb-6">
+            <h2 class="text-xl font-semibold mb-2">Patient Information</h2>
+            <p><strong>ID:</strong> {{ patient.id }}</p>
+            <p><strong>Name:</strong> {{ patient.name }}</p>
+            <p><strong>Email:</strong> {{ patient.email }}</p>
+            <p><strong>address:</strong> {{ patient.address }}</p>
+            <p><strong>Age:</strong> {{ patient.age }}</p>
+        </div>
+
+        <div class="bg-white shadow-md rounded-lg p-6 mb-6">
+            <h2 class="text-xl font-semibold mb-2">Medical History</h2>
+            <ul>
+                {% for record in medical_history %}
+                    <li class="border-b py-2">
+                        <strong>Date:</strong> {{ record.date_recorded }} - {{ record.details }}
+                    </li>
+                {% empty %}
+                    <li>No medical history available.</li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <div class="bg-white shadow-md rounded-lg p-6 mb-6">
+            <h2 class="text-xl font-semibold mb-2">Appointments</h2>
+            <ul>
+                {% for appointment in appointments %}
+                    <li class="border-b py-2">
+                        <strong>Date:</strong> {{ appointment.appointment_date |date:"Y-m-d" }}
+                    </li>
+                {% empty %}
+                    <li>No appointments scheduled.</li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <div class="bg-white shadow-md rounded-lg p-6 mb-6">
+            <h2 class="text-xl font-semibold mb-2">Billing Information</h2>
+            <ul>
+                {% for billing in billings %}
+                    <li class="border-b py-2">
+                        <strong>Date Billed:</strong> {{ billing.date_billed }} - Amount: {{ billing.amount }}
+                    </li>
+                {% empty %}
+                    <li>No billing information available.</li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <div class="bg-white shadow-md rounded-lg p-6 mb-6">
+            <h2 class="text-xl font-semibold mb-2">Prescriptions</h2>
+            <ul>
+                {% for prescription in prescriptions %}
+                    <li class="border-b py-2">
+                        <strong>Date Prescribed:</strong> {{ prescription.date_prescribed }} - Medication: {{ prescription.medication }}
+                    </li>
+                {% empty %}
+                    <li>No prescriptions available.</li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <div class="flex justify-end">
+            <a href="{% url 'patient_list' %}" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Back to Patient List</a>
+        </div>
+    </div>
+
+</body>
+</html>
